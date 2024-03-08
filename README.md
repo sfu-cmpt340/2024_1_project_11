@@ -1,12 +1,9 @@
-# SFU CMPT 340 Project Template -- Replace with project title
-This repository is a template for your CMPT 340 course project.
-Replace the title with your project title, and **add a snappy acronym that people remember (mnemonic)**.
+# Harmful Brain Activity Classification (HBAC)
 
-Add a 1-2 line summary of your project here.
-
+This model aims to classify seizures and other patterns of harmful brain activity in critically ill patients. We'll be using data provided by Harvard Medical School, as part of an ongoing [Kaggle competition](https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/overview).
 ## Important Links
 
-| [Timesheet](https://google.com) | [Slack channel](https://google.com) | [Project report](https://google.com) |
+| [Timesheet](https://1sfu-my.sharepoint.com/:x:/g/personal/hamarneh_sfu_ca/EZzEiGQNT3FAphR788z3IrYBEx8ASZ6C2IbP5BXt9pfhCg?e=dp9ZUx) | [Slack channel](https://google.com) | [Project report](https://google.com) |
 |-----------|---------------|-------------------------|
 
 
