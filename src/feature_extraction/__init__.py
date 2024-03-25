@@ -1,1 +1,3 @@
 from .channel_selection import calculate_top_channels
+from .extracted_features import calculate_std
+from .extracted_features import calculate_mean
