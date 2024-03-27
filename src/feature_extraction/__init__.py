@@ -1,4 +1,5 @@
 from .channel_selection import calculate_top_channels
+from .channel_selection import calculate_all_samples
 from .extracted_features import calculate_std
 from .extracted_features import calculate_mean
 from .extracted_features import calculate_med
@@ -6,5 +7,6 @@ from .extracted_features import calculate_kurtosis
 from .extracted_features import calculate_skewness
 from .extracted_features import calculate_max_signal
 from .extracted_features import calculate_min_signal
-from .extracted_features import calculate_features_table
+from .extracted_features import calculate_features_for_samples
 from .extracted_features import calculate_average_features
+from .extracted_features import calculate_features_table

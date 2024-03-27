@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import kurtosis, skew
+from scipy.stats import kurtosis, skew, entropy, moment
 import mne
-
+import itertools
 
 # std_calculation
 
@@ -158,11 +158,19 @@ def calculate_features_table(sig, channels):
     - Numpy array with each row containing features of a single channel.
     """
     # Define the features you will calculate
-    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'KRT']
+    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'KRT', 'ENT', 'MOM', 'POW']
     data = []
 
     for channel in channels:
         channel_data = sig[channel].dropna().values  
+        ###kate
+        # Compute probability distribution for entropy
+        hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
+        # Compute frequency vector, FFT (Fast Fourier Transform) and its conjugate for power
+        f = np.fft.fftfreq(len(sig[channel].values), 1/200) # Sampling frequency: 200 Hz
+        f_prime = np.fft.fft(sig[channel].values)
+        f_prime_conj = np.conj(f_prime)
+        ###
         std_value = np.nanstd(channel_data)
         mean_value = np.nanmean(channel_data)
         max_value = np.nanmax(channel_data)
@@ -171,18 +179,22 @@ def calculate_features_table(sig, channels):
         med_value = np.nanmedian(channel_data)
         skew_value = skew(channel_data, bias=False)
         kurt_value = kurtosis(channel_data, fisher=True, bias=False)
-        
+        ##
+        ent_value = entropy(hist, base=2)
+        mom_value = moment(channel_data, moment=4, nan_policy='omit') # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
+        pow_value = np.sum(f_prime * f_prime_conj)
+        ##
         # Create a features vector for the channel and append it to the data list
         channel_features = np.array([std_value, mean_value, max_value, min_value,
-                                     var_value, med_value, skew_value, kurt_value])
+                                     var_value, med_value, skew_value, kurt_value,
+                                     ent_value, mom_value, pow_value])
         data.append(channel_features)
 
     # Convert the list of feature vectors into a 2D numpy array
     features_array = np.array(data)
+    features_array = features_array.round(2)
     
     return features_array
-
-
 
 def calculate_average_features(features_df):
     """
