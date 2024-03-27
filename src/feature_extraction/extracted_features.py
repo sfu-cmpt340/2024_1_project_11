@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import kurtosis, skew
+from scipy.stats import kurtosis, skew, entropy, moment
 import mne
 
 
@@ -129,8 +129,6 @@ def calculate_max_signal(sig, channels):
     return channel_max_signal
 
 
-
-
 def calculate_min_signal(sig, channels):
     """
     Calculate the minimum value for specified channels in a given signal.
@@ -149,7 +147,7 @@ def calculate_min_signal(sig, channels):
         channel_min_values[channel] = min_value
     return channel_min_values
 
-
+# all_features_calculations
 def calculate_features_table(sig, channels):
     """
     Calculate various statistical features for specified channels in a given signal.
@@ -160,11 +158,20 @@ def calculate_features_table(sig, channels):
     - Numpy array with each row containing features of a single channel.
     """
     # Define the features you will calculate
-    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'KRT']
+    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'ENT', 'KRT', 'MOM', 'POW']
     data = []
 
     for channel in channels:
         channel_data = sig[channel].dropna().values  
+
+        # Compute probability distribution for entropy
+        hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
+
+        # Compute frequency vector, FFT (Fast Fourier Transform) and its conjugate for power
+        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
+        f_prime = np.fft.fft(channel_data)
+        f_prime_conj = np.conj(f_prime)
+
         std_value = np.nanstd(channel_data)
         mean_value = np.nanmean(channel_data)
         max_value = np.nanmax(channel_data)
@@ -172,11 +179,13 @@ def calculate_features_table(sig, channels):
         var_value = np.nanvar(channel_data)
         med_value = np.nanmedian(channel_data)
         skew_value = skew(channel_data, bias=False)
+        ent_value = entropy(hist, base=2)
         kurt_value = kurtosis(channel_data, fisher=True, bias=False)
+        mom_value = moment(channel_data, moment=4, nan_policy='omit') # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
+        pow_value = np.sum(f_prime * f_prime_conj)
         
         # Create a features vector for the channel and append it to the data list
-        channel_features = np.array([std_value, mean_value, max_value, min_value,
-                                     var_value, med_value, skew_value, kurt_value])
+        channel_features = np.array([std_value, mean_value, max_value,min_value, var_value, med_value, skew_value, ent_value, kurt_value, mom_value, pow_value])
         data.append(channel_features)
 
     # Convert the list of feature vectors into a 2D numpy array
