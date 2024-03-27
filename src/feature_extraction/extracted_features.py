@@ -129,8 +129,6 @@ def calculate_max_signal(sig, channels):
     return channel_max_signal
 
 
-
-
 def calculate_min_signal(sig, channels):
     """
     Calculate the minimum value for specified channels in a given signal.
@@ -183,3 +181,6 @@ def calculate_features_table(sig, channels):
     features_array = np.array(data)
     
     return features_array
+
+
+
