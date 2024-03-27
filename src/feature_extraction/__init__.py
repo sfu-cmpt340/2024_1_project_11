@@ -1,2 +1,1 @@
-from .channel_selection import calculate_top_channels
-from .channel_selection import calculate_all_samples
+from .channel_selection import calculate_top_channels, calculate_all_samples
