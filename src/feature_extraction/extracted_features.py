@@ -166,6 +166,27 @@ def calculate_variance(sig, channels):
         channel_variance[channel] = variance_value
     return channel_variance
 
+# entropy_calculation
+def calculate_entropy(sig, channels):
+    """
+    Calculate the entropy for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the minimum value.
+
+    Returns:
+    - Dictionary with channels as keys and their entropy as values.
+    """
+    channel_entropy = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        # Compute probability distribution for entropy
+        hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
+        entropy_value = entropy(hist, base=2)
+        channel_entropy[channel] = entropy_value
+    return channel_entropy
+
 # all_features_calculations
 def calculate_features_table(sig, channels):
     """
