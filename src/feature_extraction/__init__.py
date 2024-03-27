@@ -7,3 +7,4 @@ from .extracted_features import calculate_skewness
 from .extracted_features import calculate_max_signal
 from .extracted_features import calculate_min_signal
 from .extracted_features import calculate_features_table
+from .extracted_features import calculate_average_features

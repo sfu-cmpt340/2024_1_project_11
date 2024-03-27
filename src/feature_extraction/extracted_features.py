@@ -184,3 +184,25 @@ def calculate_features_table(sig, channels):
 
 
 
+def calculate_average_features(features_df):
+    """
+    Calculate the average of extracted features across specified channels.
+
+    Parameters:
+    - features_df: DataFrame containing the features for each channel.
+
+    Returns:
+    - DataFrame with a single row containing the average values of the features.
+    """
+    # Calculate the mean using prev features_df function
+    averaged_features = features_df.mean(axis=0)
+
+    # Convert the averaged features into a DataFrame
+    averaged_features_df = pd.DataFrame(averaged_features, columns=['Average']).transpose()
+
+    # Round it by 2
+    averaged_features_df = averaged_features_df.round(2)
+
+    return averaged_features_df
+
+
