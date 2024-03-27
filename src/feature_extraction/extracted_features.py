@@ -187,6 +187,29 @@ def calculate_entropy(sig, channels):
         channel_entropy[channel] = entropy_value
     return channel_entropy
 
+# power_calculation
+def calculate_power(sig, channels):
+    """
+    Calculate the power for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the minimum value.
+
+    Returns:
+    - Dictionary with channels as keys and their power as values.
+    """
+    channel_power = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        # Compute frequency vector, FFT (Fast Fourier Transform) and its conjugate for power
+        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
+        f_prime = np.fft.fft(channel_data)
+        f_prime_conj = np.conj(f_prime)
+        power_value = np.sum(f_prime * f_prime_conj)
+        channel_power[channel] = power_value
+    return channel_power
+
 # all_features_calculations
 def calculate_features_table(sig, channels):
     """
