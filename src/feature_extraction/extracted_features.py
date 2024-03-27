@@ -150,14 +150,14 @@ def calculate_min_signal(sig, channels):
 # variance_calculation
 def calculate_variance(sig, channels):
     """
-    Calculate the entropy for specified channels in a given signal.
+    Calculate the variance for specified channels in a given signal.
 
     Parameters:
     - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the minimum value.
+    - channels: List of channels for which to calculate the variance value.
 
     Returns:
-    - Dictionary with channels as keys and their entropy as values.
+    - Dictionary with channels as keys and their variance as values.
     """
     channel_variance = {}
     for channel in channels:
@@ -173,7 +173,7 @@ def calculate_entropy(sig, channels):
 
     Parameters:
     - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the minimum value.
+    - channels: List of channels for which to calculate the entropy value.
 
     Returns:
     - Dictionary with channels as keys and their entropy as values.
@@ -194,7 +194,7 @@ def calculate_power(sig, channels):
 
     Parameters:
     - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the minimum value.
+    - channels: List of channels for which to calculate the power value.
 
     Returns:
     - Dictionary with channels as keys and their power as values.
@@ -217,7 +217,7 @@ def calculate_moment(sig, channels):
 
     Parameters:
     - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the minimum value.
+    - channels: List of channels for which to calculate the moment value.
 
     Returns:
     - Dictionary with channels as keys and their moment as values.
