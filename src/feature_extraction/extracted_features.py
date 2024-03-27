@@ -210,6 +210,25 @@ def calculate_power(sig, channels):
         channel_power[channel] = power_value
     return channel_power
 
+# moment_calculation
+def calculate_moment(sig, channels):
+    """
+    Calculate the moment for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the minimum value.
+
+    Returns:
+    - Dictionary with channels as keys and their moment as values.
+    """
+    channel_moment = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        moment_value = moment(channel_data, moment=4, nan_policy='omit') # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
+        channel_moment[channel] = moment_value
+    return channel_moment
+
 # all_features_calculations
 def calculate_features_table(sig, channels):
     """
