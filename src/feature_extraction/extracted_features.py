@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import kurtosis, skew
 import mne
 
 
-# std_calculation.py
+# std_calculation
 
 def calculate_std(sig1, channels_lists):
     """
@@ -24,7 +25,7 @@ def calculate_std(sig1, channels_lists):
     return channel_std_sig1
 
 
-# mean_calculation.py
+# mean_calculation
 
 def calculate_mean(sig, channels):
     """
@@ -43,3 +44,142 @@ def calculate_mean(sig, channels):
         mean_value = np.nanmean(channel_data)
         channel_means[channel] = mean_value
     return channel_means
+
+
+# Add to calculations.py or create a new file, e.g., median_calculation.py
+
+def calculate_med(sig, channels):
+    """
+    Calculate the median for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the median.
+
+    Returns:
+    - Dictionary with channels as keys and their median as values.
+    """
+    channel_median = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        median_value = np.nanmedian(channel_data)
+        channel_median[channel] = median_value
+    return channel_median
+
+
+def calculate_kurtosis(sig, channels):
+    """
+    Calculate the kurtosis for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the kurtosis.
+
+    Returns:
+    - Dictionary with channels as keys and their kurtosis as values.
+    """
+    channel_kurtosis = {}
+    for channel in channels:
+        channel_data = sig[channel].values  
+        # 'fisher=True' returns Fisher's definition of kurtosis (kurtosis of normal == 0.0).
+        # 'bias=False' uses the unbiased estimator.
+        kurtosis_value = kurtosis(channel_data, fisher=True, bias=False)
+        channel_kurtosis[channel] = kurtosis_value
+    return channel_kurtosis
+
+
+# skewness
+
+def calculate_skewness(sig, channels):
+    """
+    Calculate the skewness for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the skewness.
+
+    Returns:
+    - Dictionary with channels as keys and their skewness as values.
+    """
+    channel_skewness = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        skewness_value = skew(channel_data, bias=False)  # 'bias=False' for unbiased skewness calculation
+        channel_skewness[channel] = skewness_value
+    return channel_skewness
+
+# extracted_features.py
+
+def calculate_max_signal(sig, channels):
+    """
+    Calculate the maximum value for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the maximum value.
+
+    Returns:
+    - Dictionary with channels as keys and their maximum value as values.
+    """
+    channel_max_signal = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        max_signal_value = np.nanmax(channel_data)  # Use nanmax to ignore NaN values
+        channel_max_signal[channel] = max_signal_value
+    return channel_max_signal
+
+
+
+
+def calculate_min_signal(sig, channels):
+    """
+    Calculate the minimum value for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the minimum value.
+
+    Returns:
+    - Dictionary with channels as keys and their minimum value as values.
+    """
+    channel_min_values = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        min_value = np.nanmin(channel_data)  
+        channel_min_values[channel] = min_value
+    return channel_min_values
+
+
+def calculate_features_table(sig, channels):
+    """
+    Calculate various statistical features for specified channels in a given signal.
+    Parameters:
+    - sig: DataFrame containing the signal data.
+    - channels: List of channels for which to calculate the features.
+    Returns:
+    - Numpy array with each row containing features of a single channel.
+    """
+    # Define the features you will calculate
+    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'KRT']
+    data = []
+
+    for channel in channels:
+        channel_data = sig[channel].dropna().values  
+        std_value = np.nanstd(channel_data)
+        mean_value = np.nanmean(channel_data)
+        max_value = np.nanmax(channel_data)
+        min_value = np.nanmin(channel_data)
+        var_value = np.nanvar(channel_data)
+        med_value = np.nanmedian(channel_data)
+        skew_value = skew(channel_data, bias=False)
+        kurt_value = kurtosis(channel_data, fisher=True, bias=False)
+        
+        # Create a features vector for the channel and append it to the data list
+        channel_features = np.array([std_value, mean_value, max_value, min_value,
+                                     var_value, med_value, skew_value, kurt_value])
+        data.append(channel_features)
+
+    # Convert the list of feature vectors into a 2D numpy array
+    features_array = np.array(data)
+    
+    return features_array
