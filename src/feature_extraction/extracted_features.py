@@ -249,9 +249,15 @@ def calculate_features_table(sig, channels):
         # Compute probability distribution for entropy
         hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
 
-        # Compute frequency vector, FFT (Fast Fourier Transform) and its conjugate for power
-        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
+        # Compute frequency vector
+        # Representing the corresponding frequencies for each element of f_prime
+        # Useful for frequency band analysis and filtering operations # Can be removed it not utilized (Sampling frequency: 200 Hz)
+        f = np.fft.fftfreq(len(channel_data), 1/200)
+
+        # Compute FFT
         f_prime = np.fft.fft(channel_data)
+        
+        # Compute FFT conjugate
         f_prime_conj = np.conj(f_prime)
 
         std_value = np.nanstd(channel_data)
