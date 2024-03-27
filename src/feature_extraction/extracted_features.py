@@ -147,6 +147,25 @@ def calculate_min_signal(sig, channels):
         channel_min_values[channel] = min_value
     return channel_min_values
 
+# variance_calculation
+def calculate_variance(sig, channels):
+    """
+    Calculate the entropy for specified channels in a given signal.
+
+    Parameters:
+    - sig: DataFrame or structured array containing the signal data.
+    - channels: List of channels for which to calculate the minimum value.
+
+    Returns:
+    - Dictionary with channels as keys and their entropy as values.
+    """
+    channel_variance = {}
+    for channel in channels:
+        channel_data = sig[channel].values
+        variance_value = np.nanvar(channel_data)
+        channel_variance[channel] = variance_value
+    return channel_variance
+
 # all_features_calculations
 def calculate_features_table(sig, channels):
     """
