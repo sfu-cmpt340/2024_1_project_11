@@ -19,8 +19,20 @@ def calculate_features_table(channel_data):
     """
     channel_features = []
     channel_data = np.nan_to_num(channel_data)  
-    # Compute probability distribution for entropy
+
+    # For entropy
+    # Compute probability distribution
     hist, bin_edges = np.histogram(channel_data, bins='auto', density=True) 
+    # Normalize the histogram counts to form a probability distribution
+    hist = hist / np.sum(hist)
+    # Compute entropy for each bin and sum them up
+    entropy_value = -np.sum(hist * np.log2(hist + np.finfo(float).eps))
+
+    # For moment
+    # Choose the order of interest to compute the nth central moment
+    order = 4
+
+    # For power
     # Compute frequency vector, representing the corresponding frequencies for each f_prime
     f_prime = np.fft.fft(channel_data)
     f_prime_conj = np.conj(f_prime)
@@ -33,9 +45,9 @@ def calculate_features_table(channel_data):
     channel_features.append(np.nanvar(channel_data))
     channel_features.append(np.nanmedian(channel_data))
     channel_features.append(skew(channel_data, bias=False))
-    channel_features.append(kurtosis(channel_data, fisher=True, bias=False))
-    channel_features.append(entropy(hist, base=2))
-    channel_features.append(moment(channel_data, moment=4, nan_policy='omit'))
+    channel_features.append(kurtosis(channel_data, fisher=False, bias=False))
+    channel_features.append(entropy_value)
+    channel_features.append(np.mean((channel_data - np.mean(channel_data))**order))
     channel_features.append(np.sum(f_prime * f_prime_conj).real) # power feature
 
     return channel_features
