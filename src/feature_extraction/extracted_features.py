@@ -83,7 +83,7 @@ def calculate_kurtosis(sig, channels):
         channel_data = sig[channel].values  
         # 'fisher=True' returns Fisher's definition of kurtosis (kurtosis of normal == 0.0).
         # 'bias=False' uses the unbiased estimator.
-        kurtosis_value = kurtosis(channel_data, fisher=True, bias=False)
+        kurtosis_value = kurtosis(channel_data, fisher=False, bias=False)
         channel_kurtosis[channel] = kurtosis_value
     return channel_kurtosis
 
@@ -183,7 +183,11 @@ def calculate_entropy(sig, channels):
         channel_data = sig[channel].values
         # Compute probability distribution for entropy
         hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
-        entropy_value = entropy(hist, base=2)
+        # Normalize the histogram counts to form a probability distribution
+        hist = hist / np.sum(hist)
+        # Compute entropy for each bin and sum them up
+        entropy_value = -np.sum(hist * np.log2(hist + np.finfo(float).eps))
+        # Store computed entropy_Value to channel_entropy[channel]
         channel_entropy[channel] = entropy_value
     return channel_entropy
 
@@ -225,7 +229,9 @@ def calculate_moment(sig, channels):
     channel_moment = {}
     for channel in channels:
         channel_data = sig[channel].values
-        moment_value = moment(channel_data, moment=4, nan_policy='omit') # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
+        # Choose the order of interest to compute the nth central moment
+        order = 4
+        moment_value = np.mean((channel_data - np.mean(channel_data))**order)
         channel_moment[channel] = moment_value
     return channel_moment
 
@@ -246,19 +252,24 @@ def calculate_features_table(sig, channels):
     for channel in channels:
         channel_data = sig[channel].dropna().values  
 
-        # Compute probability distribution for entropy
+        # For entropy
+        # Compute probability distribution
         hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
+        # Normalize the histogram counts to form a probability distribution
+        hist = hist / np.sum(hist)  # Ensure the sum of probabilities equals 1
 
+        # For power
         # Compute frequency vector
         # Representing the corresponding frequencies for each element of f_prime
         # Useful for frequency band analysis and filtering operations # Can be removed it not utilized (Sampling frequency: 200 Hz)
-        f = np.fft.fftfreq(len(channel_data), 1/200)
-
+        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
         # Compute FFT
         f_prime = np.fft.fft(channel_data)
-        
         # Compute FFT conjugate
         f_prime_conj = np.conj(f_prime)
+
+        # Choose the order of interest to compute the nth central moment
+        order = 4
 
         std_value = np.nanstd(channel_data)
         mean_value = np.nanmean(channel_data)
@@ -267,9 +278,9 @@ def calculate_features_table(sig, channels):
         var_value = np.nanvar(channel_data)
         med_value = np.nanmedian(channel_data)
         skew_value = skew(channel_data, bias=False)
-        ent_value = entropy(hist, base=2)
-        kurt_value = kurtosis(channel_data, fisher=True, bias=False)
-        mom_value = moment(channel_data, moment=4, nan_policy='omit') # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
+        ent_value = -np.sum(hist * np.log2(hist + np.finfo(float).eps))
+        kurt_value = kurtosis(channel_data, fisher=False, bias=False)
+        mom_value = np.mean((channel_data - np.mean(channel_data))**order) # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
         pow_value = np.sum(f_prime * f_prime_conj)
         
         # Create a features vector for the channel and append it to the data list
