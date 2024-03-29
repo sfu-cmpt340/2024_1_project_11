@@ -5,14 +5,14 @@ import mne
 
 def calculate_top_channels(sample_data, n=3):
     """Calculate the top channels with the highest variance for a single sample
-    
+
     Parameters
     ----------
     sample_data : pd.DataFrame
         EEG data for a single sample, with channels as columns
     n : int, optional
         Number of top channels to retrieve (default is 3)
-        
+
     Returns
     -------
     list

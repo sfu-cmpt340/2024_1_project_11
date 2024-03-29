@@ -29,7 +29,7 @@ class VisualizeEEG:
     self.raw_ = mne.io.RawArray(self.data_, self.info_)
     self.raw_.apply_function(lambda x: x / 20e6, picks='eeg')
 
-  def plot_signal(self, start, duration, n_channels=19):
+  def plot_signal(self, start, duration, scaling=None, n_channels=19):
     """ Multi-channel time series plot
 
     Parameters

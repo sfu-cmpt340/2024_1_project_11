@@ -3,291 +3,76 @@ import numpy as np
 from scipy.stats import kurtosis, skew, entropy, moment
 import mne
 
+def calculate_features_table(channel_data):
+    """Calculate features for a single EEG channel
 
-# std_calculation
+    Parameters
+    ----------
+    channel_data : array-like
+        EEG data for a single channel
 
-def calculate_std(sig1, channels_lists):
+    Returns
+    -------
+    list
+        List of calculated features including standard deviation, mean, maximum, minimum,
+        variance, median, skewness, kurtosis, entropy, 4th moment, and power.
     """
-    Calculate the standard deviation for specified channels in a given signal.
-    
-    Parameters:
-    - sig1: DataFrame or structured array containing the signal data.
-    - channels_lists: List of channels for which to calculate the standard deviation.
-    
-    Returns:
-    - Dictionary with channels as keys and their standard deviation as values.
+    channel_features = []
+    channel_data = np.nan_to_num(channel_data)  
+    # Compute probability distribution for entropy
+    hist, bin_edges = np.histogram(channel_data, bins='auto', density=True) 
+    # Compute frequency vector, representing the corresponding frequencies for each f_prime
+    f_prime = np.fft.fft(channel_data)
+    f_prime_conj = np.conj(f_prime)
+    # Useful variable for frequency band analysis and filtering operations (Sampling frequency: 200 Hz) for future use
+    # f = np.fft.fftfreq(len(channel_data), 1/200) 
+    channel_features.append(np.nanstd(channel_data))
+    channel_features.append(np.nanmean(channel_data))
+    channel_features.append(np.nanmax(channel_data))
+    channel_features.append(np.nanmin(channel_data))
+    channel_features.append(np.nanvar(channel_data))
+    channel_features.append(np.nanmedian(channel_data))
+    channel_features.append(skew(channel_data, bias=False))
+    channel_features.append(kurtosis(channel_data, fisher=True, bias=False))
+    channel_features.append(entropy(hist, base=2))
+    channel_features.append(moment(channel_data, moment=4, nan_policy='omit'))
+    channel_features.append(np.sum(f_prime * f_prime_conj).real) # power feature
+
+    return channel_features
+
+
+def extract_features_all_samples(df, top_channels_df):
+    """Extract average features for each sample from the top channels
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing EEG data for all samples, with samples as rows and channels as columns
+    top_channels_df : pd.DataFrame
+        DataFrame containing the top channels for each sample
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the average features for each sample, with samples as rows and features as columns
     """
-    channel_std_sig1 = {}
-    for channel in channels_lists:
-        channel_data = sig1[channel].values
-        std_value = np.nanstd(channel_data)
-        channel_std_sig1[channel] = std_value
-    return channel_std_sig1
+    feature_columns = ['std', 'mean', 'max', 'min', 'var', 
+                       'med', 'skew', 'kurt', 'ent', 'mom', 'pow']
+    features_df = pd.DataFrame(columns=feature_columns)
+    for sample_id in top_channels_df.index: 
+        top_channels = top_channels_df.loc[sample_id].dropna().values.tolist() 
+        if not top_channels:  
+            continue
+        sample_data = df.loc[[str(sample_id)]]
+        channel_features = []
+        for channel in top_channels:
+            channel_data = sample_data[channel]
+            channel_features.append(calculate_features_table(channel_data)) # 33 features per sample
+
+        channel_features_transposed = np.array(channel_features).T # Transposing feature list for Averaging
+        mean_features = np.mean(channel_features_transposed, axis=1) # 11 features per sample
+        features_df.loc[sample_id, :] = mean_features
+
+    return features_df
 
 
-# mean_calculation
-
-def calculate_mean(sig, channels):
-    """
-    Calculate the mean for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the mean.
-
-    Returns:
-    - Dictionary with channels as keys and their mean as values.
-    """
-    channel_means = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        mean_value = np.nanmean(channel_data)
-        channel_means[channel] = mean_value
-    return channel_means
-
-
-# Add to calculations.py or create a new file, e.g., median_calculation.py
-
-def calculate_med(sig, channels):
-    """
-    Calculate the median for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the median.
-
-    Returns:
-    - Dictionary with channels as keys and their median as values.
-    """
-    channel_median = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        median_value = np.nanmedian(channel_data)
-        channel_median[channel] = median_value
-    return channel_median
-
-
-def calculate_kurtosis(sig, channels):
-    """
-    Calculate the kurtosis for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the kurtosis.
-
-    Returns:
-    - Dictionary with channels as keys and their kurtosis as values.
-    """
-    channel_kurtosis = {}
-    for channel in channels:
-        channel_data = sig[channel].values  
-        # 'fisher=True' returns Fisher's definition of kurtosis (kurtosis of normal == 0.0).
-        # 'bias=False' uses the unbiased estimator.
-        kurtosis_value = kurtosis(channel_data, fisher=False, bias=False)
-        channel_kurtosis[channel] = kurtosis_value
-    return channel_kurtosis
-
-
-# skewness
-
-def calculate_skewness(sig, channels):
-    """
-    Calculate the skewness for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the skewness.
-
-    Returns:
-    - Dictionary with channels as keys and their skewness as values.
-    """
-    channel_skewness = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        skewness_value = skew(channel_data, bias=False)  # 'bias=False' for unbiased skewness calculation
-        channel_skewness[channel] = skewness_value
-    return channel_skewness
-
-# extracted_features.py
-
-def calculate_max_signal(sig, channels):
-    """
-    Calculate the maximum value for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the maximum value.
-
-    Returns:
-    - Dictionary with channels as keys and their maximum value as values.
-    """
-    channel_max_signal = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        max_signal_value = np.nanmax(channel_data)  # Use nanmax to ignore NaN values
-        channel_max_signal[channel] = max_signal_value
-    return channel_max_signal
-
-
-def calculate_min_signal(sig, channels):
-    """
-    Calculate the minimum value for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the minimum value.
-
-    Returns:
-    - Dictionary with channels as keys and their minimum value as values.
-    """
-    channel_min_values = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        min_value = np.nanmin(channel_data)  
-        channel_min_values[channel] = min_value
-    return channel_min_values
-
-# variance_calculation
-def calculate_variance(sig, channels):
-    """
-    Calculate the variance for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the variance value.
-
-    Returns:
-    - Dictionary with channels as keys and their variance as values.
-    """
-    channel_variance = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        variance_value = np.nanvar(channel_data)
-        channel_variance[channel] = variance_value
-    return channel_variance
-
-# entropy_calculation
-def calculate_entropy(sig, channels):
-    """
-    Calculate the entropy for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the entropy value.
-
-    Returns:
-    - Dictionary with channels as keys and their entropy as values.
-    """
-    channel_entropy = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        # Compute probability distribution for entropy
-        hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
-        # Normalize the histogram counts to form a probability distribution
-        hist = hist / np.sum(hist)
-        # Compute entropy for each bin and sum them up
-        entropy_value = -np.sum(hist * np.log2(hist + np.finfo(float).eps))
-        # Store computed entropy_Value to channel_entropy[channel]
-        channel_entropy[channel] = entropy_value
-    return channel_entropy
-
-# power_calculation
-def calculate_power(sig, channels):
-    """
-    Calculate the power for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the power value.
-
-    Returns:
-    - Dictionary with channels as keys and their power as values.
-    """
-    channel_power = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        # Compute frequency vector, FFT (Fast Fourier Transform) and its conjugate for power
-        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
-        f_prime = np.fft.fft(channel_data)
-        f_prime_conj = np.conj(f_prime)
-        power_value = np.sum(f_prime * f_prime_conj)
-        channel_power[channel] = power_value
-    return channel_power
-
-# moment_calculation
-def calculate_moment(sig, channels):
-    """
-    Calculate the moment for specified channels in a given signal.
-
-    Parameters:
-    - sig: DataFrame or structured array containing the signal data.
-    - channels: List of channels for which to calculate the moment value.
-
-    Returns:
-    - Dictionary with channels as keys and their moment as values.
-    """
-    channel_moment = {}
-    for channel in channels:
-        channel_data = sig[channel].values
-        # Choose the order of interest to compute the nth central moment
-        order = 4
-        moment_value = np.mean((channel_data - np.mean(channel_data))**order)
-        channel_moment[channel] = moment_value
-    return channel_moment
-
-# all_features_calculations
-def calculate_features_table(sig, channels):
-    """
-    Calculate various statistical features for specified channels in a given signal.
-    Parameters:
-    - sig: DataFrame containing the signal data.
-    - channels: List of channels for which to calculate the features.
-    Returns:
-    - Numpy array with each row containing features of a single channel.
-    """
-    # Define the features you will calculate
-    features = ['STD', 'Mean', 'Max', 'Min', 'Var', 'Med', 'SKW', 'ENT', 'KRT', 'MOM', 'POW']
-    data = []
-
-    for channel in channels:
-        channel_data = sig[channel].dropna().values  
-
-        # For entropy
-        # Compute probability distribution
-        hist, bin_edges = np.histogram(channel_data, bins='auto', density=True)
-        # Normalize the histogram counts to form a probability distribution
-        hist = hist / np.sum(hist)  # Ensure the sum of probabilities equals 1
-
-        # For power
-        # Compute frequency vector
-        # Representing the corresponding frequencies for each element of f_prime
-        # Useful for frequency band analysis and filtering operations # Can be removed it not utilized (Sampling frequency: 200 Hz)
-        f = np.fft.fftfreq(len(channel_data), 1/200) # Sampling frequency: 200 Hz
-        # Compute FFT
-        f_prime = np.fft.fft(channel_data)
-        # Compute FFT conjugate
-        f_prime_conj = np.conj(f_prime)
-
-        # Choose the order of interest to compute the nth central moment
-        order = 4
-
-        std_value = np.nanstd(channel_data)
-        mean_value = np.nanmean(channel_data)
-        max_value = np.nanmax(channel_data)
-        min_value = np.nanmin(channel_data)
-        var_value = np.nanvar(channel_data)
-        med_value = np.nanmedian(channel_data)
-        skew_value = skew(channel_data, bias=False)
-        ent_value = -np.sum(hist * np.log2(hist + np.finfo(float).eps))
-        kurt_value = kurtosis(channel_data, fisher=False, bias=False)
-        mom_value = np.mean((channel_data - np.mean(channel_data))**order) # Quantitave measure of distribution shape, fourth order moment is related to kurtosis
-        pow_value = np.sum(f_prime * f_prime_conj)
-        
-        # Create a features vector for the channel and append it to the data list
-        channel_features = np.array([std_value, mean_value, max_value,min_value, var_value, med_value, skew_value, ent_value, kurt_value, mom_value, pow_value])
-        data.append(channel_features)
-
-    # Convert the list of feature vectors into a 2D numpy array
-    features_array = np.array(data)
-    
-    return features_array
