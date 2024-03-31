@@ -1,2 +1,4 @@
 from .channel_selection import calculate_top_channels
 from .channel_selection import calculate_all_samples
+from .extracted_features import calculate_features_table
+from .extracted_features import extract_features_all_samples
