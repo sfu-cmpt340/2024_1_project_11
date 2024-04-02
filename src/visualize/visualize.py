@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import mne
+import matplotlib.pyplot as plt
 
 class VisualizeEEG:
   """Visualization class for given EEG signals
@@ -41,7 +42,7 @@ class VisualizeEEG:
     n_channels: Int
       Number of channels to plot
     """
-    self.raw_.plot(start=start, duration=duration, scalings={'eeg': 'auto'}, n_channels=n_channels);
+
 
   def plot_topomap(self, start, end, delta):
     """ Topographic mapping of evoked signal

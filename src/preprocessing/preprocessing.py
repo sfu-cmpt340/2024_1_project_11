@@ -1,7 +1,9 @@
 import mne
 import numpy as np
 import pandas as pd
+import pywt
 from mne.decoding import Scaler
+from torch import threshold
 
 def convert_to_mne(df):
   mne_info = mne.create_info(ch_names=df.columns.tolist(), sfreq=200, ch_types='eeg')
@@ -37,3 +39,35 @@ def standardize(df):
   scaled = scaled.reshape(data.shape)
   df_scaled = pd.DataFrame(scaled, index = df.index, columns = df.columns)
   return df_scaled
+
+def soft_threshold(data, threshold):
+  return np.sign(data) * np.maximum(np.abs(data) - threshold, 0)
+
+def estimate_noise(detail_coeffs):
+  return np.median(np.abs(detail_coeffs)) / 0.6745
+
+def universal_threshold(signal_length, sigma):
+  return sigma * np.sqrt(2 * np.log(signal_length))
+
+def wavelet_transform(df, level):
+  basis = 'coif1'
+
+  for channel in df:
+    chan_np = df[channel].to_numpy()
+    coeffs = pywt.wavedec(chan_np, basis, level=level)
+
+    sigma = estimate_noise(coeffs[-1])
+    threshold = universal_threshold(chan_np.size, sigma)
+
+    # Apply soft thresholding to detail coefficients
+    coeffs[1:] = [soft_threshold(detail_coeff, threshold) for detail_coeff in coeffs[1:]]
+    cleaned_channel = pywt.waverec(coeffs, basis)
+
+    if len(cleaned_channel) > len(chan_np):
+      cleaned_channel = cleaned_channel[:len(chan_np)]
+    elif len(cleaned_channel) < len(chan_np):
+      cleaned_channel = np.append(cleaned_channel, np.zeros(len(chan_np) - len(cleaned_channel)))
+      
+    df[channel] = cleaned_channel
+  
+  return df
