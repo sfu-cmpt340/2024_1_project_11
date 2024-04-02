@@ -63,6 +63,11 @@ def wavelet_transform(df, level):
     coeffs[1:] = [soft_threshold(detail_coeff, threshold) for detail_coeff in coeffs[1:]]
     cleaned_channel = pywt.waverec(coeffs, basis)
 
+    if len(cleaned_channel) > len(chan_np):
+      cleaned_channel = cleaned_channel[:len(chan_np)]
+    elif len(cleaned_channel) < len(chan_np):
+      cleaned_channel = np.append(cleaned_channel, np.zeros(len(chan_np) - len(cleaned_channel)))
+      
     df[channel] = cleaned_channel
   
   return df
