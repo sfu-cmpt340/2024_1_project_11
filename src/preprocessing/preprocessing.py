@@ -1,7 +1,9 @@
 import mne
 import numpy as np
 import pandas as pd
+import pywt
 from mne.decoding import Scaler
+from torch import threshold
 
 def convert_to_mne(df):
   mne_info = mne.create_info(ch_names=df.columns.tolist(), sfreq=200, ch_types='eeg')
@@ -37,3 +39,17 @@ def standardize(df):
   scaled = scaled.reshape(data.shape)
   df_scaled = pd.DataFrame(scaled, index = df.index, columns = df.columns)
   return df_scaled
+
+
+def wavelet_transform(df, level):
+  basis = 'coif1'
+
+  for channel in df:
+    chan_np = df[channel].to_numpy()
+    coeffs = pywt.wavedec(chan_np, basis, level=level)
+
+    cleaned_channel = pywt.waverec(coeffs, basis)
+
+    df[channel] = cleaned_channel
+  
+  return df
