@@ -40,6 +40,8 @@ def standardize(df):
   df_scaled = pd.DataFrame(scaled, index = df.index, columns = df.columns)
   return df_scaled
 
+def soft_threshold(data, threshold):
+  return np.sign(data) * np.maximum(np.abs(data) - threshold, 0)
 
 def wavelet_transform(df, level):
   basis = 'coif1'
@@ -47,6 +49,11 @@ def wavelet_transform(df, level):
   for channel in df:
     chan_np = df[channel].to_numpy()
     coeffs = pywt.wavedec(chan_np, basis, level=level)
+
+    threshold = 0.5
+
+    # Apply soft thresholding to detail coefficients
+    coeffs[1:] = [soft_threshold(detail_coeff, threshold) for detail_coeff in coeffs[1:]]
 
     cleaned_channel = pywt.waverec(coeffs, basis)
 
