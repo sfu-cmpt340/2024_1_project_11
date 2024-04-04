@@ -3,6 +3,24 @@ import numpy as np
 import mne
 import matplotlib.pyplot as plt
 
+def plot_signal(df, duration, channels):
+  sig_duration = 50
+  fs = 200
+  N = fs*sig_duration
+
+  samples = np.arange(N)
+  time = samples/fs
+  base_offset = 150
+
+  # Apply an increasing offset for each channel
+  for i, channel in enumerate(channels):
+    offset = i * base_offset  # Increase the offset for each channel
+    plt.plot(time, df[channel] + offset, label=channel)
+
+  plt.xlim(0, duration)
+  plt.show()
+  plt.clf()
+
 class VisualizeEEG:
   """Visualization class for given EEG signals
 
@@ -42,6 +60,7 @@ class VisualizeEEG:
     n_channels: Int
       Number of channels to plot
     """
+
 
 
   def plot_topomap(self, start, end, delta):
