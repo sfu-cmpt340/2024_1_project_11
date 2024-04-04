@@ -79,6 +79,8 @@ def extract_features_all_samples(df, top_channels_df):
         channel_features = []
         for channel in top_channels:
             channel_data = sample_data[channel]
+            channel_data = np.nan_to_num(channel_data)
+            channel_data = channel_data.flatten()
             channel_features.append(calculate_features_table(channel_data)) # 33 features per sample
 
         channel_features_transposed = np.array(channel_features).T # Transposing feature list for Averaging
