@@ -49,25 +49,30 @@ def estimate_noise(detail_coeffs):
 def universal_threshold(signal_length, sigma):
   return sigma * np.sqrt(2 * np.log(signal_length))
 
-def wavelet_transform(df, level):
-  basis = 'coif1'
+def wavelet_transform(df, level, basis='db4'):
+  signals = list(set(df.index.to_list()))
 
-  for channel in df:
-    chan_np = df[channel].to_numpy()
-    coeffs = pywt.wavedec(chan_np, basis, level=level)
+  df_copy = df.copy()
 
-    sigma = estimate_noise(coeffs[-1])
-    threshold = universal_threshold(chan_np.size, sigma)
+  for signal_id in signals:
+    curr_signal = df.loc[signal_id].copy()
+    
+    for channel in curr_signal:
+      chan_np = curr_signal[channel].to_numpy()
+      coeffs = pywt.wavedec(chan_np, basis, level=level)
 
-    # Apply soft thresholding to detail coefficients
-    coeffs[1:] = [soft_threshold(detail_coeff, threshold) for detail_coeff in coeffs[1:]]
-    cleaned_channel = pywt.waverec(coeffs, basis)
+      sigma = estimate_noise(coeffs[-1])
+      threshold = universal_threshold(chan_np.size, sigma)
 
-    if len(cleaned_channel) > len(chan_np):
-      cleaned_channel = cleaned_channel[:len(chan_np)]
-    elif len(cleaned_channel) < len(chan_np):
-      cleaned_channel = np.append(cleaned_channel, np.zeros(len(chan_np) - len(cleaned_channel)))
-      
-    df[channel] = cleaned_channel
-  
-  return df
+      # Apply soft thresholding to detail coefficients
+      coeffs[1:] = [soft_threshold(detail_coeff, threshold) for detail_coeff in coeffs[1:]]
+      cleaned_channel = pywt.waverec(coeffs, basis)
+
+      if len(cleaned_channel) > len(chan_np):
+        cleaned_channel = cleaned_channel[:len(chan_np)]
+      elif len(cleaned_channel) < len(chan_np):
+        cleaned_channel = np.append(cleaned_channel, np.zeros(len(chan_np) - len(cleaned_channel)))
+        
+      curr_signal[channel] = cleaned_channel
+    df_copy.loc[signal_id] = curr_signal
+  return df_copy
