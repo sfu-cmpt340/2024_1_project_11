@@ -6,10 +6,11 @@ from mne.decoding import Scaler
 from torch import threshold
 
 def convert_to_mne(df):
+  df_copy = df.copy()
   mne_info = mne.create_info(ch_names=df.columns.tolist(), sfreq=200, ch_types='eeg')
   mne_info.set_montage('standard_1020')
       
-  data = np.array(df.transpose())
+  data = np.array(df_copy.transpose())
   data = np.nan_to_num(data)
       
   raw = mne.io.RawArray(data, mne_info)
@@ -18,7 +19,7 @@ def convert_to_mne(df):
   return raw
 
 def notch_filter(df, freqs):
-  raw = convert_to_mne(df)
+  raw = convert_to_mne(df_copy)
   eeg_picks = mne.pick_types(raw.info, eeg=True)
   raw_notch = raw.copy().notch_filter(freqs=freqs, picks=eeg_picks)
   
