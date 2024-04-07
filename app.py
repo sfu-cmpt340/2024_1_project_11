@@ -10,6 +10,15 @@ print(model)
 
 # model = load('model.joblib')
 
+predictions_to_labels = {
+    0: 'GPD',
+    1: 'GRDA',
+    2: 'LPD',
+    3: 'LRDA',
+    4: 'OTHER',
+    5: 'SEIZURE'
+}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -18,10 +27,11 @@ def index():
 def predict():
     file = request.files['file']
     df = pd.read_csv(file)
+    predictions = model.predict(df).tolist()
+    string_predictions = [predictions_to_labels[pred] for pred in predictions]
     # Preprocess your DataFrame as needed
-    predictions = model.predict(df)
     
-    return jsonify({'predictions': predictions.tolist()})
+    return jsonify({'predictions': string_predictions})
 
 
 if __name__ == '__main__':
