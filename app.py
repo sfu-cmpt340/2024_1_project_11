@@ -6,6 +6,7 @@ import pickle
 app = Flask(__name__)
 with open('model.pkl', 'rb') as file:
     model = pickle.load(file)
+print(model)
 
 # model = load('model.joblib')
 
