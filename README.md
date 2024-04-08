@@ -8,6 +8,7 @@ This model aims to classify seizures and other patterns of harmful brain activit
 
 ## Video/demo/GIF
 For the demonstration, we created a web interface that identifies neurological disorders and displays the output to users upon receiving data input. Once we put the single data file as a CSV file and upload the data, the analysis result shows at the bottom.
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/XXy3TBCCN7k/0.jpg)](https://www.youtube.com/watch?v=XXy3TBCCN7k)
 
 ## Table of Contents
