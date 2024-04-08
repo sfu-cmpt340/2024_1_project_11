@@ -3,14 +3,8 @@
 This model aims to classify seizures and other patterns of harmful brain activity in critically ill patients. We'll be using data provided by Harvard Medical School, as part of an ongoing [Kaggle competition](https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/overview).
 ## Important Links
 
-| [Timesheet](https://1sfu-my.sharepoint.com/:x:/g/personal/hamarneh_sfu_ca/EZzEiGQNT3FAphR788z3IrYBEx8ASZ6C2IbP5BXt9pfhCg?e=dp9ZUx) | [Slack channel](https://google.com) | [Project report](https://google.com) |
+| [Timesheet](https://1sfu-my.sharepoint.com/:x:/g/personal/hamarneh_sfu_ca/EZzEiGQNT3FAphR788z3IrYBEx8ASZ6C2IbP5BXt9pfhCg?e=dp9ZUx) | [Slack channel](https://app.slack.com/client/T06AP91EYG6/C06DW516NA1?selected_team_id=T06AP91EYG6) | [Project report](https://www.overleaf.com/7196966197swyzqqdqbkxt#c96211) |
 |-----------|---------------|-------------------------|
-
-
-- Timesheet: Link your timesheet (pinned in your project's Slack channel) where you track per student the time and tasks completed/participated for this project/
-- Slack channel: Link your private Slack project channel.
-- Project report: Link your Overleaf project report document.
-
 
 ## Video/demo/GIF
 For the demonstration, we created a web interface that identifies neurological disorders and displays the output to users upon receiving data input. Once we put the single data file as a CSV file and upload the data, the analysis result shows at the bottom.
