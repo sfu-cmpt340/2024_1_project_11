@@ -1,1 +1,1 @@
-from .visualize import VisualizeEEG
+from .visualize import VisualizeEEG, plot_signal

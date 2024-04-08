@@ -1,6 +1,25 @@
 import pandas as pd
 import numpy as np
 import mne
+import matplotlib.pyplot as plt
+
+def plot_signal(df, duration, channels):
+  sig_duration = 50
+  fs = 200
+  N = fs*sig_duration
+
+  samples = np.arange(N)
+  time = samples/fs
+  base_offset = 150
+
+  # Apply an increasing offset for each channel
+  for i, channel in enumerate(channels):
+    offset = i * base_offset  # Increase the offset for each channel
+    plt.plot(time, df[channel] + offset, label=channel)
+
+  plt.xlim(0, duration)
+  plt.show()
+  plt.clf()
 
 class VisualizeEEG:
   """Visualization class for given EEG signals
@@ -29,7 +48,7 @@ class VisualizeEEG:
     self.raw_ = mne.io.RawArray(self.data_, self.info_)
     self.raw_.apply_function(lambda x: x / 20e6, picks='eeg')
 
-  def plot_signal(self, start, duration, n_channels=19):
+  def plot_signal(self, start, duration, scaling=None, n_channels=19):
     """ Multi-channel time series plot
 
     Parameters
@@ -41,7 +60,8 @@ class VisualizeEEG:
     n_channels: Int
       Number of channels to plot
     """
-    self.raw_.plot(start=start, duration=duration, scalings={'eeg': 'auto'}, n_channels=n_channels);
+
+
 
   def plot_topomap(self, start, end, delta):
     """ Topographic mapping of evoked signal

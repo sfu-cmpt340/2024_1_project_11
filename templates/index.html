@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEG Classification Project</title>
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>CMPT 340 EEG Classification Project</h1>
+        <p>© 2024 CMPT 340 Group 11</p>
+    </header>
+
+    <section id="home">
+        <p>Receives EEG signal data as input, utilizes advanced analysis techniques, and identifies neurological disorders</p>
+    </section>
+
+    <section id="data-upload">
+        <h2>Data Upload</h2>
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <input type="submit" value="Upload Data">
+        </form>
+        </form>
+    </section>
+
+    <section id="results">
+        <h2>Results</h2>
+        <p id="predictionResults">Upload data to see results.</p>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            $('#uploadForm').on('submit', function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                $.ajax({
+                    type: 'POST',
+                    url: '/upload',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Update the results section with predictions
+                        $('#predictionResults').text('Predictions: ' + response.predictions.join(', '));
+                    },
+                    error: function(response) {
+                        $('#predictionResults').text('Error: Could not get predictions.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
