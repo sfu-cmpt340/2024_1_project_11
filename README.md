@@ -13,7 +13,7 @@ This model aims to classify seizures and other patterns of harmful brain activit
 
 
 ## Video/demo/GIF
-https://www.youtube.com/watch?v=XXy3TBCCN7k&ab_channel=kaicho
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/XXy3TBCCN7k/0.jpg)](https://www.youtube.com/watch?v=XXy3TBCCN7k)
 
 ## Table of Contents
 1. [Demo](#demo)
