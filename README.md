@@ -55,16 +55,14 @@ conda activate 340-project-11
 
 <a name="repro"></a>
 ## 3. Reproduction
-Demonstrate how your work can be reproduced, e.g. the results in your report.
+Our python script contains code that automatically retrieves 1000 signals from our dataset.
+
+To reproduce our model results, run the following:
 ```bash
-mkdir tmp && cd tmp
-wget https://yourstorageisourbusiness.com/dataset.zip
-unzip dataset.zip
-conda activate amazing
-python evaluate.py --epochs=10 --data=/in/put/dir
+conda activate 340-project-11
+python hms.py
 ```
-Data can be found at ...
-Output will be saved in ...
+Alternatively, you can run the Jupyter notebook hms.ipynb.
 
 <a name="guide"></a>
 ## 4. Guidance
