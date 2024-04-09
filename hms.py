@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 import tarfile
-import urllib
+import urllib.request
 
 def load_metadata():
   file_path = Path("data/train.csv")
