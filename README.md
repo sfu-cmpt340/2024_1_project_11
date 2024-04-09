@@ -24,7 +24,7 @@ For the demonstration, we created a web interface that identifies neurological d
 <a name="demo"></a>
 ## 1. Example demo
 
-A minimal example to showcase your work
+After using ```flask run``` to start a flask server, in the webpage, upload sample.csv and the result is shown in the result section
 
 ![alt text](images/demo_img.png)
 
