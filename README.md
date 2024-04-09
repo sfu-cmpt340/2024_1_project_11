@@ -26,12 +26,8 @@ For the demonstration, we created a web interface that identifies neurological d
 
 A minimal example to showcase your work
 
-```python
-from amazing import amazingexample
-imgs = amazingexample.demo()
-for img in imgs:
-    view(img)
-```
+![alt text](images/demo_img.png)
+
 
 ### What to find where
 
