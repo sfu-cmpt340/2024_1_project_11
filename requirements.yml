@@ -189,6 +189,7 @@ dependencies:
   - libxml2=2.12.5=h0d0cfa8_0
   - libzip=1.10.1=ha0bc3c6_3
   - libzlib=1.2.13=h53f4e23_5
+  - conda-forge::lightgbm
   - lightning-utilities=0.10.1=pyhd8ed1ab_0
   - llvm-openmp=17.0.6=hcd81f8e_0
   - locket=1.0.0=pyhd8ed1ab_0
@@ -324,4 +325,3 @@ dependencies:
       - pyqt5==5.15.10
       - pyqt5-qt5==5.15.13
       - pyqt5-sip==12.13.0
-prefix: /Users/gagetylee/anaconda3/envs/340-project
