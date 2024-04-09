@@ -30,16 +30,24 @@ For the demonstration, we created a web interface that identifies neurological d
 
 ### What to find where
 
-Explain briefly what files are found where
 
-```bash
 repository
-├── src                          ## source code of the package itself
-├── scripts                      ## scripts, if needed
-├── docs                         ## If needed, documentation   
+├── calculations                 ## Testing correctness for feature values
+├── data                         ## EEG sample datasets 
+├── images                       ## Images for our doc and demo
+├── src                          ## Source code for our package itself
+│   └── feature_extraction/
+│   └── preprocessing/
+│   └── utils/
+│   └── visualize/
+│
+├── static/css                   ## Styling for our HTML demo
+├── templates                    ## HTML templates for our demo          
 ├── README.md                    ## You are here
-├── requirements.yml             ## If you use conda
-```
+├── requirements.yml             ## Dependencies
+├── hms.ipynb                    ## Jupyter notebook
+├── hms.py                       ## Python file for our Jupyter notebook
+
 
 <a name="installation"></a>
 
