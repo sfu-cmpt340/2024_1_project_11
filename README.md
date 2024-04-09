@@ -30,7 +30,7 @@ For the demonstration, we created a web interface that identifies neurological d
 
 ### What to find where
 
-
+```bash
 repository
 ├── calculations                 ## Testing correctness for feature values
 ├── data                         ## EEG sample datasets 
@@ -47,7 +47,7 @@ repository
 ├── requirements.yml             ## Dependencies
 ├── hms.ipynb                    ## Jupyter notebook
 ├── hms.py                       ## Python file for our Jupyter notebook
-
+```
 
 <a name="installation"></a>
 
