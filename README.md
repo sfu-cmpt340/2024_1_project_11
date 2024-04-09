@@ -46,14 +46,12 @@ repository
 
 ## 2. Installation
 
-Provide sufficient instructions to reproduce and install your project. 
-Provide _exact_ versions, test on CSIL or reference workstations.
-
-```bash
-git clone $THISREPO
-cd $THISREPO
-conda env create -f requirements.yml
-conda activate amazing
+To clone the repository and install required dependencies please run:
+```batch
+git clone git@github.com:sfu-cmpt340/2024_1_project_11.git
+cd 2024_1_project_11
+conda env create -n 340-project-11 -f requirements.yml
+conda activate 340-project-11
 ```
 
 <a name="repro"></a>
